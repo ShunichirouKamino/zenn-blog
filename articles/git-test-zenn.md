@@ -10,7 +10,7 @@ published: false
 
 ## CLI のインストール
 
-```console
+```bash
 $ npm init --yes # プロジェクトをデフォルト設定で初期化
 $ npm install zenn-cli # zenn-cliを導入
 ```
@@ -19,7 +19,7 @@ $ npm install zenn-cli # zenn-cliを導入
 
 Zenn を管理したいフォルダで以下を実施します。
 
-```console
+```bash
 $ npx zenn init
 ```
 
@@ -28,7 +28,7 @@ $ npx zenn init
 
 ## 記事の作成
 
-```console
+```bash
 $ npx zenn new:article
 # 記事のURLの一部となるslugを指定して作成することもできます。
 $ npx zenn new:article --slug my-awesome-article
