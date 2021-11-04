@@ -33,3 +33,9 @@ $ npx zenn new:article
 # 記事のURLの一部となるslugを指定して作成することもできます。
 $ npx zenn new:article --slug my-awesome-article
 ```
+
+## プレビュー
+
+```bash
+$ npx zenn preview
+```
