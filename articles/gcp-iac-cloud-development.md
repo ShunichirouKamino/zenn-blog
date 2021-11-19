@@ -53,7 +53,7 @@ environment = devshell
 
 - project が正しくセットされていない場合は、`$ gcloud config set project [MY_PROJECT]`にて自身のプロジェクトをセットします。
 
-# まずは動かす
+# とにかく動かす
 
 まずは、一番簡単な GCE インスタンスを立ち上げてみます。
 
