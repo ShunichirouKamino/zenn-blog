@@ -55,7 +55,7 @@ environment = devshell
 
 # とにかく動かす
 
-まずは、一番簡単な GCE インスタンスを立ち上げてみます。
+一番簡単な GCE インスタンスを立ち上げます。
 
 ```yaml
 resources:
