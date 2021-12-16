@@ -1,7 +1,7 @@
 {
   "name": "zenn",
   "version": "1.0.0",
-  "description": "",
+  "description": "* [📘 How to use](https://zenn.dev/zenn/articles/zenn-cli-guide)",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,5 +11,13 @@
   "license": "ISC",
   "dependencies": {
     "zenn-cli": "^0.1.98"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShunichirouKamino/zenn-blog.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ShunichirouKamino/zenn-blog/issues"
+  },
+  "homepage": "https://github.com/ShunichirouKamino/zenn-blog#readme"
 }
