@@ -10,7 +10,7 @@ published: false
 
 ## 主要な OpenJDK の Java11 の LTS 及び Java17 の提供開始
 
-### [AdoptOpenJDK(Eclipse Adoptium)](https://adoptopenjdk.net/)
+### [Eclipse Adoptium(旧 AdoptOpenJDK)](https://adoptopenjdk.net/)
 
 - Java11 の LTS：2024 年 10 月（[AdoptOpenJDK Support](https://adoptopenjdk.net/support.html)）
   - ※できる限りその後もサポートするよと言っているが、基本はここを EOS と考えるのが自然
@@ -41,8 +41,24 @@ published: false
 - [OpenJDK - JDK 16](https://openjdk.java.net/projects/jdk/16/)
 - [OpenJDK - JDK 17](https://openjdk.java.net/projects/jdk/17/)
 
--
+# 導入したい構文
 
-- **この記事で目指す姿**
+## [JEP 394: Pattern Matching for instanceof](https://openjdk.java.net/jeps/394)
 
-![moverview](/images/gcp-gke-loggin/overview.png)
+明示的なキャスト時に、これまでは慣用として以下の構文を利用していました。
+
+```java
+if (obj instanceof String) {
+    String s = (String) obj;
+    ...
+}
+```
+
+instanceof 時に同時にオブジェクトの形状比較（パターンマッチング）が行われ、キャスト後の変数`s`がスコープ内で利用できるようになりました。
+
+```java
+if (obj instanceof String s) {
+    // Let pattern matching do the work!
+    ...
+}
+```
