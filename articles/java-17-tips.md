@@ -45,6 +45,79 @@ published: false
 
 JDK17 の時点で、正式リリースされた構文のみ紹介してます。
 
+## Java14
+
+### [JEP 361: Switch Expressions](https://openjdk.java.net/jeps/361)
+
+switch 式が利用できるようになりました。式になると、値を返すことが可能になります。
+これにより、`break`の記載忘れや、一時変数の宣言といったバグを埋め込みやすいコードが削減されます。
+switch 式合わせて、`case`に複数指定が可能となっています。
+
+- 従来の書き方
+
+```java
+    Season season;
+    switch (month) {
+    case 12, 1, 2:
+        season = Season.WINTER;
+        break;
+    case 3, 4, 5:
+        season = Season.SPRING;
+        break;
+    case 6, 7, 8:
+        season = Season.SUMMER;
+        break;
+    case 9, 10, 11:
+        season = Season.AUTUMN;
+        break;
+    default:
+        throw new IllegalArgumentException("Unexpected value: " + month);
+    };
+    System.out.println(season.name());
+```
+
+- `yield`による明示的な値の返却の書き方
+
+```java
+    final var month = 3;
+    enum Season {
+        SPRING, SUMMER, AUTUMN, WINTER
+    };
+
+    final var season = switch (month) {
+    case 12, 1, 2:
+        yield Season.WINTER;
+    case 3, 4, 5:
+        yield Season.SPRING;
+    case 6, 7, 8:
+        yield Season.SUMMER;
+    case 9, 10, 11:
+        yield Season.AUTUMN;
+    default:
+        throw new IllegalArgumentException("Unexpected value: " + month);
+    };
+    System.out.println(season.name());
+```
+
+- アロー式での書き方
+  - アロー式は、`yield`を省略したシンタックスシュガー。
+
+```java
+    final var month = 3;
+    enum Season {
+        SPRING, SUMMER, AUTUMN, WINTER
+    };
+
+    final var season = switch (month) {
+    case 12, 1, 2 -> Season.WINTER;
+    case 3, 4, 5 -> Season.SPRING;
+    case 6, 7, 8 -> Season.SUMMER;
+    case 9, 10, 11 -> Season.AUTUMN;
+    default -> throw new IllegalArgumentException("Unexpected value: " + month);
+    };
+    System.out.println(season.name());
+```
+
 ## Java16
 
 ### [JEP 394: Pattern Matching for instanceof](https://openjdk.java.net/jeps/394)
