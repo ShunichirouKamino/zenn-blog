@@ -111,6 +111,7 @@ class Point {
 
 record クラスを用いると、上記の`Bean`が以下の実装となります。
 
+- `record`クラスは、明示的に`final`となります。
 - 各要素の private final が自動実装されます。
 - getter として、`int x()`, `int y()`が自動実装されます。
 - `Canonical Constructor`が自動実装されます。
@@ -215,4 +216,65 @@ Class とありますが、interface でも実装可能です。
     final class Rectangle implements Shape {...}
     final class Square implements Shape {...}
     }
+```
+
+これは、特に`record`との組み合わせでうまく機能します。
+`sealed`と`record`の組み合わせは、代数的データ型と呼ばれます。
+
+# 付録
+
+## 代数的データ型
+
+以下 3 つのデータ型を合わせて代数的データ型と言います。
+
+- 列挙型
+- 直積型
+- 直和型
+
+### 列挙型
+
+列挙型は、同一の型の羅列です。列挙できることは、言い換えると`switch`可能ということを表しています。
+Java では、`enum`で表現されます。同一の型の値を列挙し、種類を区別します。
+
+```java
+    enum Color {
+        BLUE, RED, GREEN,
+    }
+```
+
+### 直積型
+
+直積型は、型の制限です。これまでの Java で表現することは難しく、C 言語では、構造体がこれに該当します。
+Employee の取りうる値の範囲は、$(intの範囲 * char[51]の範囲 * intの範囲)$で表現できるからと理解しています。
+
+```c
+struct Employee {
+        int number;     /* 従業員番号 */
+        char name[51];  /* 氏名 */
+        int salary;     /* 給与 */
+};
+```
+
+Java で`record`が導入されたことにより、これを表現することが可能になりました。
+
+```java
+    record Employee(int number, String name, int salary) {}
+```
+
+### 直和型
+
+列挙型と直積型両方の特徴を持っています。つまり、
+
+- switch 可能
+- 要素を複数持つことが可能
+
+となります。これは、Java で`slealed`が実装されたことで実現されました。
+
+```java
+    sealed interface Person permits Teacher,Student {}
+    record Teacher(int serviceYears, String name, int salaly) implements Person {};
+    record Student(int age, String name) implements Person {};
+
+    final var student = new Student(15, "Taro");
+    final var teacher = new Teacher(3, "Hanako", 5_000_000);
 ```
