@@ -112,7 +112,7 @@ record クラスを用いると、上記の`Bean`が以下の実装となりま�
 - 各要素の private final が自動実装されます。
 - getter として、`int x()`, `int y()`が自動実装されます。
 - `Default Constructor`が自動実装されます。
-  - その他、`Compact Constructor`と`Canonical Constructor`を定義可能です。（後述）
+  - その他、`Compact Constructor`を定義可能です。（後述）
 - `equals()`及び`hashCode()`が自動実装されます。
 - `toString()`が自動実装されます。
 
@@ -123,14 +123,37 @@ record Point(int x, int y) {}
 #### コンストラクタ
 
 - `Default Constructor`
-  自動実装されるコンストラクタです。
+  自動実装されるコンストラクタです。変数への代入のみの役割を持ちます。
   上記 Point レコードであれば、以下のコンストラクタが自動生成されます。
 
-#### Canonical Constructor
+```java
+    Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+```
 
-例で記載の Canonical Constructor は、
+- `Compact Constructor`
+  コンパクトコンストラクタには、検証等を行うコードのみを記載します。
+  その他のフィールドへの値を代入する初期化コードは、実装する必要はありません。
+  例えば、それぞれが正の値である必要が有る場合は、以下のようにバリデーションを実装します。
 
-#### Compact Constructor
+```java
+    record Point(int x, int y) {
+        Point {
+            if (x < 0) {
+                throw new ...
+            }
+            if (y < 0) {
+                throw new ...
+            }
+        }
+    }
+```
+
+- `Factory`
+  ファクトリパターンの実装も可能です。
+  ファクトリは、Java には
 
 ## [JEP 409: Sealed Classes](https://openjdk.java.net/jeps/409)
 
