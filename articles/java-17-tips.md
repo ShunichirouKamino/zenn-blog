@@ -43,9 +43,11 @@ published: false
 
 # 導入したい構文
 
-## [JEP 394: Pattern Matching for instanceof](https://openjdk.java.net/jeps/394)
+## java16
 
-明示的なキャスト時に、これまでは慣用として以下の構文を利用していました。
+### [JEP 394: Pattern Matching for instanceof](https://openjdk.java.net/jeps/394)
+
+明示的なキャスト時に、これまでは慣用として以下の構文を利用していました。これは、`obj` が `String` でない場合の`ClassCastException`を防ぐためです。
 
 ```java
 if (obj instanceof String) {
@@ -54,7 +56,7 @@ if (obj instanceof String) {
 }
 ```
 
-instanceof 時に同時にオブジェクトの形状比較（パターンマッチング）が行われ、キャスト後の変数`s`がスコープ内で利用できるようになりました。
+`instanceof` 時に同時にオブジェクトの形状比較（パターンマッチング）が行われ、キャスト後の変数`s`がスコープ内で利用できるようになりました。
 
 ```java
 if (obj instanceof String s) {
@@ -62,3 +64,98 @@ if (obj instanceof String s) {
     ...
 }
 ```
+
+### [JEP 395: Records](https://openjdk.java.net/jeps/395)
+
+`record`クラスは、以下の目標として実装されました。
+
+- 冗長な Java において、以下のモチベーションでコードの簡略化を行う
+  - 不変なデータのモデリングを行う
+  - equals 等のメソッドを自動で実装する
+
+これまでの`Bean`の実装には、変数を 2 つ持つだけでも以下のような冗長なコードの記載が必要でした。
+
+```java
+class Point {
+    private final int x;
+    private final int y;
+
+    Point(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    int x() { return x; }
+    int y() { return y; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Point)) return false;
+        Point other = (Point) o;
+        return other.x == x && other.y == y;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Point[x=%d, y=%d]", x, y);
+    }
+}
+```
+
+record クラスを用いると、上記の`Bean`が以下の実装となります。
+
+- 各要素の private final が自動実装されます。
+- getter として、`int x()`, `int y()`が自動実装されます。
+- `Default Constructor`が自動実装されます。
+  - その他、`Compact Constructor`と`Canonical Constructor`を定義可能です。（後述）
+- `equals()`及び`hashCode()`が自動実装されます。
+- `toString()`が自動実装されます。
+
+```java
+record Point(int x, int y) {}
+```
+
+#### コンストラクタ
+
+- `Default Constructor`
+  自動実装されるコンストラクタです。
+  上記 Point レコードであれば、以下のコンストラクタが自動生成されます。
+
+#### Canonical Constructor
+
+例で記載の Canonical Constructor は、
+
+#### Compact Constructor
+
+## [JEP 409: Sealed Classes](https://openjdk.java.net/jeps/409)
+
+java は、現実世界のドメインを明示的に表現するために便利な構文として、`enum`が存在します。
+
+```java
+enum Shape { MERCURY, VENUS, EARTH }
+
+Shape shape = ...
+switch (shape) {
+    case CIRCLE: ...
+    case RECTANGLE: ...
+    case SQUARE: ...
+}
+```
+
+これは、`Planet` を単純なコード値として分岐処理を設ける際には、可読性の側面で大きな威力を発揮します。
+しかし、本来は MERCURY, VENUS, EARTH には別々の処理（メソッド）を持たせたい場合が多いです。
+そういった場合は、以下のような実装となります。
+
+```java
+interface Celestial { ... }
+final class Planet implements Celestial { ... }
+final class Star   implements Celestial { ... }
+final class Comet  implements Celestial { ... }
+```
+
+`Celestial`（天体）を実装することで、
