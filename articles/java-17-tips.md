@@ -100,7 +100,7 @@ switch 式合わせて、`case`に複数指定が可能となっています。
 ```
 
 - アロー式での書き方
-  - アロー式は、`yield`を省略したシンタックスシュガー。
+  - アロー式は、`yield`を省略したシンタックスシュガーです。
 
 ```java
     final var month = 3;
@@ -117,6 +117,67 @@ switch 式合わせて、`case`に複数指定が可能となっています。
     };
     System.out.println(season.name());
 ```
+
+## Java15
+
+### [JEP 378: Text Blocks](https://openjdk.java.net/jeps/378)
+
+改行を含んだ文字列が定義できるようになりました。
+
+```java
+    String query = "SELECT \"EMP_ID\", \"LAST_NAME\" FROM \"EMPLOYEE_TB\"\n" + "WHERE \"CITY\" = 'INDIANAPOLIS'\n"
+            + "ORDER BY \"EMP_ID\", \"LAST_NAME\";\n";
+
+    String query2 = """
+            SELECT "EMP_ID", "LAST_NAME" FROM "EMPLOYEE_TB"
+            WHERE "CITY" = 'INDIANAPOLIS'
+            ORDER BY "EMP_ID", "LAST_NAME";
+            """;
+
+    System.out.println(query);
+    System.out.println(query2);
+```
+
+どちらも出力は、以下のようになります。
+
+> SELECT "EMP_ID", "LAST_NAME" FROM "EMPLOYEE_TB"
+> WHERE "CITY" = 'INDIANAPOLIS'
+> ORDER BY "EMP_ID", "LAST_NAME";
+
+- コード上の改行箇所と、String として扱いたい改行箇所を明示的に合わせることができる。
+
+  - これまでは`\n`で改行を埋め込むが、コード上ちょうどよい箇所で改行をするためにはフォーマッタの調整が必要。
+  - なにより、改行文字のエスケープシーケンスが不要となる。
+
+- 改行をエスケープする
+
+```java
+    String query = """
+            SELECT "EMP_ID", "LAST_NAME" FROM "EMPLOYEE_TB" \
+            WHERE "CITY" = 'INDIANAPOLIS' \
+            ORDER BY "EMP_ID", "LAST_NAME";
+            """;
+    System.out.println(query);
+```
+
+> SELECT "EMP_ID", "LAST_NAME" FROM "EMPLOYEE_TB" WHERE "CITY" = 'INDIANAPOLIS' ORDER BY "EMP_ID", "LAST_NAME";
+
+- 変数を外だしする
+
+```java
+    String query = """
+            SELECT "EMP_ID", "LAST_NAME" FROM "EMPLOYEE_TB"
+            WHERE "CITY" = %s
+            ORDER BY "EMP_ID", "LAST_NAME";
+            """.formatted("'INDIANAPOLIS'");
+    System.out.println(query);
+```
+
+> SELECT "EMP_ID", "LAST_NAME" FROM "EMPLOYEE_TB"
+> WHERE "CITY" = 'INDIANAPOLIS'
+> ORDER BY "EMP_ID", "LAST_NAME";
+
+TODO Pettern 等の正規表現時の利用を追記する
 
 ## Java16
 
