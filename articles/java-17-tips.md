@@ -80,7 +80,7 @@ class Point {
     private final int x;
     private final int y;
 
-    Point(int x, int y) {
+    Point(final int x, final int y) {
         this.x = x;
         this.y = y;
     }
@@ -111,7 +111,7 @@ record クラスを用いると、上記の`Bean`が以下の実装となりま�
 
 - 各要素の private final が自動実装されます。
 - getter として、`int x()`, `int y()`が自動実装されます。
-- `Default Constructor`が自動実装されます。
+- `Canonical Constructor`が自動実装されます。
   - その他、`Compact Constructor`を定義可能です。（後述）
 - `equals()`及び`hashCode()`が自動実装されます。
 - `toString()`が自動実装されます。
@@ -122,9 +122,9 @@ record Point(int x, int y) {}
 
 #### コンストラクタ
 
-- `Default Constructor`
+- `Canonical Constructor`
   自動実装されるコンストラクタです。変数への代入のみの役割を持ちます。
-  上記 Point レコードであれば、以下のコンストラクタが自動生成されます。
+  上記 Point record であれば、以下のコンストラクタが自動生成されます。
 
 ```java
     Point(int x, int y) {
@@ -137,6 +137,7 @@ record Point(int x, int y) {}
   コンパクトコンストラクタには、検証等を行うコードのみを記載します。
   その他のフィールドへの値を代入する初期化コードは、実装する必要はありません。
   例えば、それぞれが正の値である必要が有る場合は、以下のようにバリデーションを実装します。
+  引数は、`record`クラスを明示する際に指定しているため、コンストラクタ引数は不要です。
 
 ```java
     record Point(int x, int y) {
@@ -153,7 +154,21 @@ record Point(int x, int y) {}
 
 - `Factory`
   ファクトリパターンの実装も可能です。
-  ファクトリは、Java には
+  ファクトリパターンは、Java には存在しないデフォルト引数を実現するために有意義です。
+  以下は、y を固定した（デフォルトとした）ファクトリと、x,y を受け取るファクトリを実装したレコードクラスの例です。
+
+```java
+    record Point(int x, int y) {
+        public static Point of(final int x) {
+            final var y = 1;
+            return new Point(x, y);
+        }
+
+        public static Point of(final int x, final int y) {
+            return new Point(x, y);
+        }
+    }
+```
 
 ## [JEP 409: Sealed Classes](https://openjdk.java.net/jeps/409)
 
