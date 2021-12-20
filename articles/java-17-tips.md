@@ -43,7 +43,9 @@ published: false
 
 # 導入したい構文
 
-## java16
+JDK17 の時点で、正式リリースされた構文のみ紹介してます。
+
+## Java16
 
 ### [JEP 394: Pattern Matching for instanceof](https://openjdk.java.net/jeps/394)
 
@@ -172,12 +174,13 @@ record Point(int x, int y) {}
 
 ## [JEP 409: Sealed Classes](https://openjdk.java.net/jeps/409)
 
-java は、現実世界のドメインを明示的に表現するために便利な構文として、`enum`が存在します。
+`Sealed Classes`は、DDD の文脈におけるドメイン知識をコードに落とし込む際に重要な役割を果たします。
+Java には元々、現実世界のドメインを明示的に表現するために便利な構文として、`enum`が存在します。
 
 ```java
-enum Shape { MERCURY, VENUS, EARTH }
+enum Shape { CIRCLE, RECTANGLE, SQUARE }
 
-Shape shape = ...
+Shape shape = Shape.CIRCLE;
 switch (shape) {
     case CIRCLE: ...
     case RECTANGLE: ...
@@ -185,15 +188,31 @@ switch (shape) {
 }
 ```
 
-これは、`Planet` を単純なコード値として分岐処理を設ける際には、可読性の側面で大きな威力を発揮します。
-しかし、本来は MERCURY, VENUS, EARTH には別々の処理（メソッド）を持たせたい場合が多いです。
-そういった場合は、以下のような実装となります。
+これは、`Shape` を単純なコード値として分岐処理を設ける際には、可読性の側面で大きな威力を発揮します。
+しかし、CIRCLE, RECTANGLE, SQUARE には別々の処理（メソッド）を持たせたい場合が多いです。
+そういった場合は、interface を用いて以下のような実装となります。
 
 ```java
-interface Celestial { ... }
-final class Planet implements Celestial { ... }
-final class Star   implements Celestial { ... }
-final class Comet  implements Celestial { ... }
+    interface Shape {...}
+    final class Circle implements Shape {...}
+    final class Rectangle implements Shape {...}
+    final class Square implements Shape {...}
 ```
 
-`Celestial`（天体）を実装することで、
+`Shape`を実装することで、`Shape`の持つドメイン知識を継承し、それぞれのクラスにふるまいを持たせることが可能です。
+しかし致命的な問題が一点あります。この実装では、このアプリケーション上`Shape`には`CIRCLE`, `RECTANGLE`, `SQUARE`の 3 種類しか存在しないということを表せていません。
+
+ここで登場するのが、`Sealed Classes`です。
+Class とありますが、interface でも実装可能です。
+
+- `Sealed`は、`Shield`ではなく、封じられたという意味合い。
+- `permits`句にて指定したクラスで実装されていない場合は、`sealed`クラス側にコンパイルエラーが発生する。
+- `permits`句にて指定したクラス以外で実装された場合は、実装クラス側にコンパイルエラーが発生する。
+
+```java
+    public sealed interface Shape permits Circle,Rectangle,Square {...}
+    final class Circle implements Shape {...}
+    final class Rectangle implements Shape {...}
+    final class Square implements Shape {...}
+    }
+```
