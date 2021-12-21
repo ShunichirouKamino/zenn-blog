@@ -1,9 +1,9 @@
 ---
-title: "Java17で導入すべき構文"
+title: "Java17へのアップデート時に導入すべき構文"
 emoji: "😸"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Java"]
-published: false
+published: true
 ---
 
 # 30 秒で概要
