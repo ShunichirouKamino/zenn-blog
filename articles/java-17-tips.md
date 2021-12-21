@@ -43,7 +43,9 @@ published: false
 
 # 導入したい構文
 
-JDK17 の時点で、正式リリースされた構文のみ紹介してます。
+Java17 までのアップデートに含まれる構文には、ドメイン（現実世界の業務）実装を、より簡単にするための機能が盛り込まれています。
+ドメインの実装を行うにあたり、`列挙型`、`直積型`、`直和型`という考え方が重要になります。
+付録として末尾に記載したので、参考にご参照ください。
 
 ## Java14
 
@@ -307,7 +309,7 @@ record Point(int x, int y) {}
     }
 ```
 
-## [JEP 409: Sealed Classes](https://openjdk.java.net/jeps/409)
+### [JEP 409: Sealed Classes](https://openjdk.java.net/jeps/409)
 
 `Sealed Classes`は、DDD の文脈におけるドメイン知識をコードに落とし込む際に重要な役割を果たします。
 Java には元々、現実世界のドメインを明示的に表現するために便利な構文として、`enum`が存在します。
@@ -353,7 +355,40 @@ Class とありますが、interface でも実装可能です。
 ```
 
 これは、特に`record`との組み合わせでうまく機能します。
-`sealed`と`record`の組み合わせは、代数的データ型と呼ばれます。
+敢えてストレートに表現すると、「異なる構造体」の「列挙」が可能となります。
+こういった`sealed`と`record`の組み合わせは、代数的データ型と呼ばれます。
+
+## Java17
+
+### [JEP 406: Pattern Matching for switch (Preview)](https://openjdk.java.net/jeps/406)
+
+プレビュー版ですが、switch のパターンマッチングの拡張により、`sealed`と`record`との組み合わせにより、高度なドメインの実装が可能となりました。
+
+- 以下のような、`Teacher`と`Student`を直和でデータ定義します。
+
+```java
+    sealed interface Person permits Teacher,Student { }
+    record Teacher(int serviceYears, String name, int employmentAge) implements Person { };
+    record Student(int age, String name) implements Person { };
+
+    final Person student = new Student(15, "Taro");
+    final Person teacher = new Teacher(5, "Hanako", 23);
+```
+
+- switch のパターンマッチングにより、それぞれの型に応じて処理を分岐することが可能になりました。
+
+```java
+    final var age = switch (person) {
+    case Teacher t -> t.employmentAge() + t.serviceYears();
+    case Student s -> s.age();
+    default -> throw new IllegalArgumentException("Unexpected value: " + person);
+    };
+
+    System.out.println(age);
+```
+
+> `person`が`Teacher`の場合、28 と計算されます。
+> `person`が`Student`の場合、15 が出力されます。
 
 # 付録
 
@@ -406,9 +441,19 @@ Java で`record`が導入されたことにより、これを表現すること�
 
 ```java
     sealed interface Person permits Teacher,Student {}
-    record Teacher(int serviceYears, String name, int salaly) implements Person {};
+    record Teacher(int serviceYears, String name, int employmentAge) implements Person {};
     record Student(int age, String name) implements Person {};
 
     final var student = new Student(15, "Taro");
-    final var teacher = new Teacher(3, "Hanako", 5_000_000);
+    final var teacher = new Teacher(5, "Hanako", 23);
 ```
+
+# 終わりに
+
+- Java17 までのアップデートの中には、ドメイン（現実世界の業務）を実装するのに役立つ機能が盛り込まれました。
+  これは、保守性を見越したシステムを構築するために、プリミティブな型ではなく、設計段階からドメインを意識した実装が必要だということを示唆しているようにも見えます。
+  - これまで`Enum`で無理やり`interface`を切ったりしていた実装が、より簡素に汎用的に実現できます。
+- Java17 までのアップデートの中には、コードを簡略化し、バグが埋め込まれにくい仕組みが導入されました。
+  - switch 式
+  - instanceof のパターンマッチング
+  - textblock による長文 String の可読性向上
