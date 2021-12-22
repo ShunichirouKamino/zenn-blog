@@ -179,8 +179,6 @@ switch 式合わせて、`case`に複数指定が可能となっています。
 > WHERE "CITY" = 'INDIANAPOLIS'
 > ORDER BY "EMP_ID", "LAST_NAME";
 
-TODO Pettern 等の正規表現時の利用を追記する
-
 ## Java16
 
 ### [JEP 394: Pattern Matching for instanceof](https://openjdk.java.net/jeps/394)
