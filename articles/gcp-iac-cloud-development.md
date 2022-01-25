@@ -3,7 +3,7 @@ title: "GCPにおけるIaC（Cloud Development Manager）を触ってみる"
 emoji: "👌"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["GCP", "IaC", "CDM"]
-published: false
+published: true
 ---
 
 # 10 秒で概要

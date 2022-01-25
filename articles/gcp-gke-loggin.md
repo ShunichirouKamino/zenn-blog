@@ -3,7 +3,7 @@ title: "GKEログ監視が便利になりました！"
 emoji: "😸"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["GCP", "GKE", "Logging", "Monitoring"]
-published: false
+published: true
 ---
 
 # 10 秒で概要
