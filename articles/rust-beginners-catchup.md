@@ -22,12 +22,6 @@ published: false
 - 写経に適したチュートリアルの紹介
 - 躓きポイントの紹介
 
-**その他**
-
-- 環境は、Windows10 を想定しています。
-- VSCode は必須です。
-- Docker は任意です。
-
 # Rust のいいところ
 
 ## Rust はメモリ安全な言語です。
@@ -501,6 +495,9 @@ pub fn any() -> Result<String> {
 # 環境のセットアップ
 
 - 当記事に記載の VSCode 環境は、[rust-sandbox](https://github.com/ShunichirouKamino/rust-sandbox)にて公開しています。
+  - 環境は、Windows10 を想定しています。
+  - VSCode は必須です。
+  - Docker は任意です。
 
 ## ローカルに Rust の環境をセットアップする場合
 
@@ -532,3 +529,77 @@ pub fn any() -> Result<String> {
   Rust 公式日本語版
 - [Rust の最初のステップ](https://docs.microsoft.com/ja-jp/learn/paths/rust-first-steps/)
   Microsoft 社提供のチュートリアル
+
+# 躓きポイントの紹介
+
+## **Hello, world で登場するエクスクラメーションマーク**
+
+- メタプログラミングの文脈で登場する、マクロという構文です。
+- 関数と使い方が似ていますが。一言でいうと、プログラムをプログラミングする為の構文です。
+- 関数と違い、引数を可変数取ることが可能です。
+
+```rust
+fn main() {
+    let x = "Hello, world";
+    println!("Hello, world");
+    println!("{}", x);
+}
+```
+
+- マクロの使い方を学ぶだけなら簡単ですが、マクロを自作したり、マクロの中身を理解しようとすると飛躍的に難易度が上がります。
+
+# **返り値があるのに return が無い関数**
+
+- Rust では、最後の式で評価された値が戻り値になります。
+- 『式』は値を返し、『文』は値を返しません。
+- 式には`;`が不要で、よく見ると最後の節は式になっています。
+
+```rust
+fn parse() -> Result<i32, ParseIntError> {
+    let number = match "10".parse::<i32>() {
+        Ok(number) => number,
+        Err(e) => return Err(e),
+    };
+    Ok(number)
+}
+```
+
+- よく見るのは返り値 Result に対して、最後が Ok で終わる関数です。
+
+# **if let**
+
+- デストラクチャリング（分割代入）と if 演算が同時に行われ、その後の処理の有無が決定します。
+
+```rust
+enum Foo {
+    GRID { x: f64, y: f64 }
+    POINT { x: f64 }
+}
+
+fn main() {
+    let g = Foo::GRID {x: 0.1, y: 0.2};
+    if let Foo::GRID {x, y} = g { // デストラクチャリングにより、分割代入が行われる
+        println!("{}, {}", x, y); // 分割代入が成功した場合のみ、0.1, 0.2が出力
+    }
+    if let FOO::POINT {x, y} = g {  // POINTにgは代入できない
+        println!("{}, {}", x, y); // ここの分岐には到達しない
+    }
+}
+```
+
+# クロージャ
+
+- **|x| x + 1**
+  - クロージャです。Rust におけるクロージャとは、Java におけるラムダ式であり、匿名関数です。
+  - `JavaScript`におけるクロージャとは、関数とその関数が参照可能な変数スコープのことですが、Rust では少し意味が違うようです。
+    - とはいえ以下の例では、匿名関数 f が束縛する変数範囲は main のスコープまでなので、全く遠い概念ではありません。
+
+```rust
+fn main() {
+    let a = 50;
+    let f = |x| x + a;
+    println!("{}", f(10)); // 60
+}
+```
+
+# 終わりに
