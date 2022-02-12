@@ -1,9 +1,9 @@
 ---
-title: "なぜRustか"
+title: "なぜRustなの？と言われた時のために"
 emoji: "🦔"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Rust"]
-published: false
+published: true
 ---
 
 # 20 秒で概要
@@ -603,3 +603,5 @@ fn main() {
 ```
 
 # 終わりに
+
+良い Rust ライフを！
