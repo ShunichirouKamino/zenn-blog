@@ -81,7 +81,7 @@ fn f() {
 ルール ② により、`get_length`以降`f()`では`s`にアクセスすることはできません。
 
 ```rust
-fn get_length(s: String) -> usize {
+fn get_length(s: &String) -> usize {
     s.len()
 }
 
@@ -110,7 +110,7 @@ fn f() {
 借用は、`s`が immutable の場合のみ（Rust ではデフォルトで変数は final）可能です。
 
 ```rust
-fn get_length(s: String) -> usize {
+fn get_length(s: &String) -> usize {
     s.len()
 }
 
