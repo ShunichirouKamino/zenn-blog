@@ -3,16 +3,17 @@ title: "React Routerのv6へのアップデートが大変だったよという�
 emoji: "😸"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["React", "TypeScript", "ReactRouter"]
-published: false
+published: true
 ---
 
 # 20 秒で概要
 
-せこせこと利用 OSS のアップデートをしている中、React Router の v5 から v6 へのアップデートでとても苦労したというお話です。
+利用中の OSS のアップデートをしている中、React Router の v5 から v6 へのアップデートで少し苦労したというお話です。
 
 ## 参考
 
 - [スタッフブログ](https://remix.run/blog/react-router-v6)
+- [(公式)UPGRADING TO V6 - Upgrading from v5](https://reactrouter.com/docs/en/v6/upgrading/v5#advantages-of-route-element)
 
 ## 修正点を掻い摘んで
 
@@ -26,10 +27,22 @@ published: false
 - `useHistory`が`useNavigate`になりました。
   - これも`<Redirect>`同様にデフォルトが push に代わっています。
 - `useRouteMatch`が`useMatch`になりました。
+- サブ Route として登録される場合は、絶対パスではなく上位 Route からの相対パスで記載するようになりました。
+
+## 何が困ったの？
+
+後方互換無しので中々に破壊的なアップデートでした。
+上記修正点については機械的に置き換えていけばいいものの、機械的にな修正では耐えられなかったポイントについて解説します。
+
+## 注意
+
+- React Router v6 は、React16.8 以降を利用する必要が有ります。
 
 # 困ったポイント
 
 ## Routes の直下コンポーネントは Route しか受け付けない
+
+### v5 での実装
 
 これまで、ログイン状況に応じて無理やりログイン画面に戻すために、`<Route>`コンポーネント wrap した`<PrivateRoute>`を作成していました。
 中身の処理は外部コンポーネントや自作フックを利用しているので、雰囲気だけでも伝わればよいなと思います。
@@ -71,7 +84,9 @@ export const PrivateRoute: React.FC<RouteProps> = ({
 };
 ```
 
-これを、まずは機械的に`<Switch>`を`<Route>`に変更し、遷移コンポーネントも`element`で指定するように変更したところ、以下のエラーが発生しました。
+### v6 への機械的な修正
+
+まずは機械的に`<Switch>`を`<Route>`に変更し、遷移コンポーネントも`element`で指定するように変更したところ、以下のエラーが発生しました。
 
 - ルートコンポーネント
 
@@ -98,6 +113,8 @@ router.tss:5 Uncaught Error: [PrivateRoute] is not a <Route> component. All comp
     at Routes (components.tsxx:256:20)
 ```
 
+### v6 への本格対応
+
 最終的に、以下のような冗長な書き方になりました。
 
 - ルートコンポーネント
@@ -118,6 +135,8 @@ router.tss:5 Uncaught Error: [PrivateRoute] is not a <Route> component. All comp
 
 ## ルートパスへのアクセスで Login 画面にリダイレクトしたい
 
+### v5 での実装
+
 これまでは、以下のように Switch のどこにもマッチしなかった場合には、最終的に`/login` に Redirect するようにしていました。これは、URL 自体も`/`ではなく`/login`としたかったため、Redirect を利用しています。
 
 - ルートコンポーネント
@@ -133,6 +152,8 @@ router.tss:5 Uncaught Error: [PrivateRoute] is not a <Route> component. All comp
   <Redirect to="/login" />
 </Switch>
 ```
+
+### v6 への機械的な修正
 
 `<Redirect>`は`<Navigate>`となったため以下のように修正すると、前節同様に`<Routes>`配下は`<Route>`にする旨がエラーとして出力されました。（replace, push は意識してません）
 
@@ -164,6 +185,8 @@ router.tss:5 Uncaught Error: [Navigate] is not a <Route> component. All componen
     at Routes (components.tsxx:256:20)
 ```
 
+### v6 への本格対応
+
 最終的に、以下のような書き方としました。
 
 ```tsx:idnex.tsx
@@ -177,13 +200,100 @@ router.tss:5 Uncaught Error: [Navigate] is not a <Route> component. All componen
 </Routes>
 ```
 
+## Routes のネストの際にワイルドカードにて子 Route の登録が求められるようになった
+
+### v5 での実装
+
+- ルートコンポーネントでは、Switch にてパスとマッピングして子コンポーネントを登録
+
+```tsx:index.tsx
+<Switch>
+  <Route path="/login" exact>
+    <Login />
+  </Route>
+  <Route path="/menu">
+    <Menu />
+  </Route>
+  <Route path="/user">
+    <Users />
+  </Route>
+</Switch>
+```
+
+- 各子コンポーネント内での詳細なルーティング
+  - Users コンポーネントにて UserList と UserDetail を表示するコンポーネント
+
+```tsx:index.tsx
+<Switch>
+  <Route path="/user" exact>
+    <UserList />
+  </Route>
+  <Route path="/user/details">
+    <User />
+  </Route>
+</Switch>
+```
+
+### v6 への機械的な修正
+
+- ルートコンポーネントでは、Switch を Routes に変更し、elements 属性にコンポーネントを登録していきます。
+
+```tsx:index.tsx
+<Routes>
+  <Route path="/login" element={<Login />} />
+  <Route path="/menu" element={<Menu />} />
+  <Route path="/user" element={<User />} />>
+</Routes>
+```
+
+- 子コンポーネントも同様に、Switch を Routes に変更し、elements 属性にコンポーネントを登録していきます。この際、親 Route からの相対パスで設定します。
+
+```tsx:index.tsx
+<Routes>
+  <Route path="/" elements={<UserList />} />
+  <Route path="/details" elements={<User />} />
+</Routes>
+```
+
+- 発生したエラー
+
+```sh
+VM1618 react_devtools_backend.js:3973 You rendered descendant <Routes> (or called `useRoutes()`) at "/workflow" (under <Route path="/user">) but the parent route path has no trailing "*". This means if you navigate deeper, the parent won't match anymore and therefore the child routes will never render.
+
+Please change the parent <Route path="/user"> to <Route path="/user/*">.
+```
+
+v6 では、サブルートがレンダリングされる際には、ルートパスにて以降のパスをワイルドカードによって許可する必要が有るようです。
+Switch による曖昧一致ではなくなったことや、exact が廃止されたこととにも関連して、正確なルーティングを行うための一環と言えます。
+
+### v6 への本格対応
+
+- 子コンポーネントでサブルートが存在する場合、ルートコンポーネントにワイルドカードを指定します。
+
+```tsx:index.tsx
+<Routes>
+  <Route path="/login" element={<Login />} />
+  <Route path="/menu" element={<Menu />} />
+  <Route path="/user/*" element={<User />} />>
+</Routes>
+```
+
+- 子コンポーネントは変わらず、指定するサブルートはワイルドカード以降のパスを指定しています。
+
+```tsx:index.tsx
+<Switch>
+  <Route path="/" elements={<UserList />} />
+  <Route path="/details" elements={<User />} />
+</Switch>
+```
+
 # 番外編
 
-update をに合わせてリファクタリングを行う中で、修正が発生したもので、v6 とは関係ないが少しは待ったポイント。
+update をに合わせてリファクタリングを行う中で、修正が発生したもので、v6 とは関係ないが少しハマったポイントです。
 
 ## 現在のパスを取得する方法を useRouteMatch から useLocation に変更したら末尾"/"が消えた
 
-そもそも useLocation か useHistory から pathname を取得するべきですが、以下のように現在のパスを取得していました。
+そもそも useLocation から pathname を取得するべきですが、以下のように現在のパスを取得していました。
 
 - 修正前
 
@@ -201,3 +311,17 @@ useRouteMatch が useMatch となったこともあり、現在のパスを取�
 const location = useLocation();
 return <Navigate to={`${location.pathname}/details`} />
 ```
+
+※v5 では、useHistory からも history.location.pathname のように現在のパスが取得できていました。useLocation との違いは、useLocation はレンダリング時にミュータブルで有り、useHistory の場合はイミュータブルでした。明確に使い分けなければいけない場面は少なかったですが、useHistory が useNavigate になったことで、実質 useLocation からしか現在のパスは取得できなくなりました。
+
+# 終わりに
+
+なぜこうも破壊的なメジャーアップデートをしたか、これはスタッフブログで述べられています。
+
+> 新しいルーターがリリースされる最大の理由は、React フックの登場です。
+
+クラスベースで React コンポーネントを実装するのはやめて、React フックを利用すた関数コンポーネントでコンポーネントを作成していく潮流に乗っかったということでしょう。
+
+React18 で話題の`<React.Suspense>`や`React.lazy()`との親和性にも触れられており、[サンプルコード](https://github.com/remix-run/react-router/blob/main/examples/lazy-loading/src/App.tsx)も提供されています。
+
+なお、v5 との後方互換も開発中とのことです。
