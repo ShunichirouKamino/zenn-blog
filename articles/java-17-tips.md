@@ -307,6 +307,8 @@ record Point(int x, int y) {}
     }
 ```
 
+## Java17
+
 ### [JEP 409: Sealed Classes](https://openjdk.java.net/jeps/409)
 
 `Sealed Classes`は、DDD の文脈におけるドメイン知識をコードに落とし込む際に重要な役割を果たします。
@@ -355,8 +357,6 @@ Class とありますが、interface でも実装可能です。
 これは、特に`record`との組み合わせでうまく機能します。
 敢えてストレートに表現すると、「異なる構造体」の「列挙」が可能となります。
 こういった`sealed`と`record`の組み合わせは、代数的データ型と呼ばれます。
-
-## Java17
 
 ### [JEP 406: Pattern Matching for switch (Preview)](https://openjdk.java.net/jeps/406)
 
