@@ -1,0 +1,12 @@
+{
+    // 前略
+    "remark.format": {
+        "rules": {
+            "bullet": "-",
+            "listItemIndent": "1",
+            "fences": true,
+            "rule": "-",
+            "ruleSpaces": false,
+        }
+    }
+}
