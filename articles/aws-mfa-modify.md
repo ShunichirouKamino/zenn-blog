@@ -1,6 +1,6 @@
 ---
 
-title: "MFA仕様変更で運用やポリシー設定が変わった"
+title: "AWSのMFA仕様変更でポリシー設定が変わりました"
 emoji: "😸"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["AWS", "Security"]
