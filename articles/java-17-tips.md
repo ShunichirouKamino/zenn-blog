@@ -126,6 +126,10 @@ switch 式合わせて、`case`に複数指定が可能となっています。
 
 改行を含んだ文字列が定義できるようになりました。
 
+- コード上の改行箇所と、String として扱いたい改行箇所を明示的に合わせることができる。
+  - これまでは`\n`で改行を埋め込むが、コード上ちょうどよい箇所で改行をするためにはフォーマッタの調整が必要。
+  - なにより、改行文字のエスケープシーケンスが不要となる。
+
 ```java
     String query = "SELECT \"EMP_ID\", \"LAST_NAME\" FROM \"EMPLOYEE_TB\"\n" + "WHERE \"CITY\" = 'INDIANAPOLIS'\n"
             + "ORDER BY \"EMP_ID\", \"LAST_NAME\";\n";
@@ -146,12 +150,7 @@ switch 式合わせて、`case`に複数指定が可能となっています。
 > WHERE "CITY" = 'INDIANAPOLIS'
 > ORDER BY "EMP_ID", "LAST_NAME";
 
-- コード上の改行箇所と、String として扱いたい改行箇所を明示的に合わせることができる。
-
-  - これまでは`\n`で改行を埋め込むが、コード上ちょうどよい箇所で改行をするためにはフォーマッタの調整が必要。
-  - なにより、改行文字のエスケープシーケンスが不要となる。
-
-- 改行をエスケープする
+- 改行は無視されます。
 
 ```java
     String query = """
@@ -164,7 +163,7 @@ switch 式合わせて、`case`に複数指定が可能となっています。
 
 > SELECT "EMP_ID", "LAST_NAME" FROM "EMPLOYEE_TB" WHERE "CITY" = 'INDIANAPOLIS' ORDER BY "EMP_ID", "LAST_NAME";
 
-- 変数を外だしする
+- 変数を外出しもできます。
 
 ```java
     String query = """
@@ -356,16 +355,16 @@ Class とありますが、interface でも実装可能です。
 
 これは、特に`record`との組み合わせでうまく機能します。
 敢えてストレートに表現すると、「異なる構造体」の「列挙」が可能となります。
-こういった`sealed`と`record`の組み合わせは、代数的データ型と呼ばれます。
+こういった`sealed`と`record`の組み合わせは、代数的データ型のうち「直和型」と呼ばれます。
 
 ### [JEP 406: Pattern Matching for switch (Preview)](https://openjdk.java.net/jeps/406)
 
-プレビュー版ですが、switch のパターンマッチングの拡張により、`sealed`と`record`との組み合わせにより、高度なドメインの実装が可能となりました。
+プレビュー版ですが、switch のパターンマッチングの拡張により、`sealed`と`record`との組み合わせで高度なドメインの実装が可能となりました。
 
 - 以下のような、`Teacher`と`Student`を直和でデータ定義します。
 
 ```java
-    sealed interface Person permits Teacher,Student { }
+    sealed interface Person permits Teacher, Student { }
     record Teacher(int serviceYears, String name, int employmentAge) implements Person { };
     record Student(int age, String name) implements Person { };
 
