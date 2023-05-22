@@ -39,7 +39,7 @@ Autocompleteで表示するデータである`<li>`要素についても当然DO
 - サーバサイドAPIの追加開発が不要
   - サンプルではGoogleMapのAPIが「前方一致」で返却されるAPIとなっている。中間一致等も検討する場合、サーバサイド側での改修が必要となる。
 - 入力値を受け付けるまではAPIコールをしないため、初期値が0件になってしまい、入力前にスクロールはできない。
-  ![](./gif/data-api.gif)
+  ![](../images/autocomplete-fat-data/data-api.gif)
 
 # react-window
 [react-window](https://github.com/bvaughn/react-window)は、レンダリング予定のデータを仮想化することで、膨大な量のデータのレンダリングパフォーマンスを向上させるReactライブラリです。レンダリング範囲（プラスマイナス数件）のデータのみがDOMに展開されるため、レンダリングコストが少なくなります。react-windowは、以下の4つのメインコンポーネントから成ります。
@@ -54,7 +54,7 @@ Autocompleteで表示するデータである`<li>`要素についても当然DO
   - 各要素のサイズを変更可能なGrid要素
 
 例として、10000件のリストを描画すると、以下のような動作になります。前後の要素は事前に数件読み込まれているため、スクロールと描画はほぼ同時となります。しかし離れた要素にアクセスする場合は仮想リストから読み込むため、一瞬ホワイトアウトします。
-![](./gif/virtuallist.gif)
+![](../images/autocomplete-fat-data/virtuallist.gif)
 
 今回のユースケースでは、Autocompleteに与えるList要素を作成するため、前者2つのコンポーネントを検証します。
 
@@ -218,11 +218,11 @@ export default DataListVirtualization;
 
 Storyから要素数を変更して与えた場合の動きは、以下の通りです。
 
-![](./gif/virtualdatalist-paform.gif)
+![](../images/autocomplete-fat-data/virtualdatalist-paform.gif)
 
 # TIPS
 - レンダリングの前後読み込まれることで、マウススクロール時には滑らかなレンダリングが行われるようになっています。前後訳5件のデータを読み込んでおり、デフォルト値を変えられるのかどうかは未検証です。
-  ![](./gif/indexlist.gif)
+  ![](../images/autocomplete-fat-data/indexlist.gif)
 - 20万件を超えたあたりから、レンダリング遅延が発生します。これは、Autocomplete側のlabelを構築する際に、1件ごとに処理が走るためです。
   - `getOptionLabel`オプションにより、labelを構築するコールバック関数を指定することができます。これはデフォルトでも`(option) => option.label ?? option`となっております。この処理は、Optionの描画範囲とは関係なく、Optionの描画されるタイミングで、仮想化されたデータも含めて全件のlabelを構築するような動きをします。
   - これにより、これ以上の件数をレンダリングする際や、画面上複数のAutocompleteが必要になる際は、APIコールによる手法も検討する必要が有ります。
