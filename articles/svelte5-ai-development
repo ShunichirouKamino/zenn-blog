@@ -1,10 +1,19 @@
-# Svelte 5 は AI コーディング時代の最適解か？ ― React との比較から見えてくる開発体験の違い
+---
 
+title: "Svelte 5 は AI コーディング時代の最適解か？"
+emoji: "😸"
+type: "tech" # tech: 技術記事 / idea: アイデア
+topics: ["Svelte", "React"]
+published: true
+
+---
 ## はじめに
 
 ChatGPT や Claude Code をはじめとする AI コーディングツールの普及により、フレームワーク選定の基準が変わりつつあります。「人間が書きやすいか」だけでなく、**「AI が正確に生成・理解しやすいか」** という観点が重要度を増しています。
 
 本記事では、Svelte 5 のサンプルアプリ（タスク管理アプリ）を題材に、React との具体的なコード比較を通じて、AI 開発における Svelte の優位性を検証します。
+
+なお当記事におけるデモコードは、[svelte-demo](https://github.com/ShunichirouKamino/svelte-demo)に配置しています。
 
 ---
 
