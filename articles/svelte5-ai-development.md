@@ -36,6 +36,54 @@ ChatGPT や Claude Code をはじめとする AI コーディングツールの�
 
 **現在の最新バージョンは Svelte 5 系（5.x）** であり、SvelteKit と合わせてフルスタックな Web 開発が可能です。
 
+
+### Svelte と SvelteKit の関係
+
+Svelte のエコシステムに初めて触れると、「Svelte」と「SvelteKit」の2つの名前が出てきて混乱しがちです。これらは明確に役割が分かれています。
+
+| | Svelte | SvelteKit |
+|---|---|---|
+| **何か** | UI コンポーネントフレームワーク + コンパイラ | Svelte ベースのアプリケーションフレームワーク |
+| **担当範囲** | コンポーネントの記述・リアクティビティ・DOM 更新 | ルーティング・SSR・ビルド・デプロイ |
+| **React エコシステムでの対応** | React 本体 | Next.js / Remix |
+| **単体で使えるか** | 使える（Vite + Svelte で SPA 構築可能） | Svelte が必須（SvelteKit 単体では動かない） |
+
+```
+┌─────────────────────────────────────────────┐
+│  SvelteKit（アプリケーションフレームワーク）       │
+│                                             │
+│  ・ファイルベースルーティング（+page.svelte）   │
+│  ・レイアウト（+layout.svelte）               │
+│  ・SSR / SSG / SPA 切り替え                  │
+│  ・$lib エイリアス                            │
+│  ・アダプター（Vercel / Node / 静的出力）      │
+│                                             │
+│  ┌─────────────────────────────────────┐    │
+│  │  Svelte（UIフレームワーク + コンパイラ）  │    │
+│  │                                     │    │
+│  │  ・.svelte コンポーネント             │    │
+│  │  ・Runes ($state, $derived, $effect) │    │
+│  │  ・テンプレート構文 ({#each}, {#if})   │    │
+│  │  ・スコープ付き CSS                   │    │
+│  │  ・トランジション                     │    │
+│  └─────────────────────────────────────┘    │
+└─────────────────────────────────────────────┘
+```
+
+本サンプルアプリでの対応関係:
+
+| 要素 | 提供元 |
+|------|-------|
+| `$state`、`$derived`、`$effect`、`$props` | **Svelte** |
+| `{#each}`、`{#snippet}`、`transition:slide` | **Svelte** |
+| `<style>` スコーピング | **Svelte**（コンパイラ） |
+| `.svelte.ts` でのリアクティビティ | **Svelte**（コンパイラ） |
+| `src/routes/+page.svelte`、`+layout.svelte` | **SvelteKit**（ルーティング） |
+| `$lib` パスエイリアス | **SvelteKit** |
+| `npm run dev` / `npm run build` | **SvelteKit** + Vite |
+
+つまり、本記事で解説している Runes やテンプレート構文は **Svelte** の機能であり、ファイル配置のルール（`+page.svelte` 等）やビルド・デプロイの仕組みは **SvelteKit** の機能です。
+
 ### Svelte 5 の主要な特徴
 
 Svelte 5 では **Runes** と呼ばれる新しいリアクティビティシステムが導入されました。`$` プレフィックス付きの関数（`$state`、`$derived`、`$effect`、`$props` など）でリアクティビティを宣言します。
